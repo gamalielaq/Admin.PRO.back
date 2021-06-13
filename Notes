@@ -1,0 +1,20 @@
+npm run start:dev
+npm i bcryptjs  --> ayuda a encriptar contraseñas
+
+//a instalar
+
+SERVER
+    -nodemoon
+
+ -- express-fileupload  --> npm i express-fileupload
+ --uuid  --> npm i uuid 
+
+Alt + 96 = `
+Alt + 0180 = ´
+Alt + 39 = '
+
+
+
+//Git comands
+    - git tag -a v0.11.0 -m "Crud y file upload"
+    - git push --tags
