@@ -18,7 +18,7 @@ app.use( expres.json() );
 dbConnection();
 
 //Directorio público
-app.use( expres.static('public') );
+app.use( expres.static('public'));
 
 //Rutas
 app.use('/api/usuarios', require('./routes/usuarios.routes'));
