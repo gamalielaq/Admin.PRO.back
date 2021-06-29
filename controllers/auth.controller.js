@@ -3,10 +3,13 @@ const Usuario = require('../models/usuario');
 const bcryp = require('bcryptjs');
 const { generarJWT } = require('../helpers/jwt');
 const { googleVerify } = require('../helpers/google-verify');
+const { AwsClient } = require('google-auth-library');
 
 const login = async ( req, res = response ) => {
 
     const { email, password } = req.body;
+
+    console.log( password );
 
     try {
         
@@ -103,9 +106,13 @@ const renewToken = async( req, res = response)=> { //fn para renovar token
     //generar JSON Web Token
      const token = await generarJWT( uid )
 
+     //Obtener el usario por el uid
+     const usuario = await Usuario.findById( uid );
+
     res.json({
         ok:true,
-        uid
+        token: token,
+        usuario
     })
 }
 
