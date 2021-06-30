@@ -8,20 +8,10 @@ const getUsuarios = async(req, res) => {
 
     const desde = Number(req.query.desde) || 0;
 
-
-    
-    // const usuario = await Usuario
-    //                 .find({}, 'nombre email role google')
-    //                 .skip( desde )
-    //                 .limit( 5 )
-
-
-    // const total = await Usuario.count();
-
     const [ usuario, total ] =  await Promise.all([
-
+        
         Usuario
-               .find({}, 'nombre email role google img')
+               .find({}, 'nombre email rol google img')
                .skip( desde )
                .limit( 5 ),
 
@@ -160,7 +150,7 @@ const deleteUsuario = async (req, res = response) => {
 
         await Usuario.findByIdAndDelete( uid );
 
-        res.status(500).json({
+        res.status(200).json({
             ok:true,
             msg:'Usuario Eliminado'
         });
