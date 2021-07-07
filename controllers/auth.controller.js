@@ -1,56 +1,57 @@
-const { response } =  require('express');
+const { response } = require('express');
 const Usuario = require('../models/usuario');
 const bcryp = require('bcryptjs');
 const { generarJWT } = require('../helpers/jwt');
 const { googleVerify } = require('../helpers/google-verify');
-const { AwsClient } = require('google-auth-library');
+const { getMenuFrontEnd } = require('../helpers/menu-frontend');
 
-const login = async ( req, res = response ) => {
+const login = async(req, res = response) => {
 
     const { email, password } = req.body;
 
-    console.log( password );
+    console.log(password);
 
     try {
-        
-        const usuarioDB = await Usuario.findOne( { email } );
+
+        const usuarioDB = await Usuario.findOne({ email });
 
         //Verificar Email
 
-        if( !usuarioDB ) {
+        if (!usuarioDB) {
             return res.status(400).json({
-                ok:false,
-                msg:'Email no valido'
+                ok: false,
+                msg: 'Email no valido'
             })
         }
 
         //Verificar contraseña
 
-        const validPasword = bcryp.compareSync( password , usuarioDB.password );
+        const validPasword = bcryp.compareSync(password, usuarioDB.password);
 
         console.log('estatusDs: ', validPasword);
 
-        if( !validPasword ) {
+        if (!validPasword) {
             return res.status(400).json({
-                ok:false,
+                ok: false,
                 msg: 'Contraseña no valida'
             })
         }
 
         //generar JSON Web Token
-        const token = await generarJWT( usuarioDB.id )
+        const token = await generarJWT(usuarioDB.id)
 
         res.json({
-            ok:true,
-            token
+            ok: true,
+            token,
+            menu: getMenuFrontEnd(usuarioDB.rol)
         })
-        
-        
+
+
     } catch (error) {
         console.log(error);
 
         res.status(500).json({
-            ok:false,
+            ok: false,
             msg: 'Hable con el administrador'
         })
     }
@@ -59,21 +60,21 @@ const login = async ( req, res = response ) => {
 const googleSignIn = async(req, res = response) => {
 
     const googleToken = req.body.token;
-    
+
     try {
 
-        const { name, email, picture } = await googleVerify( googleToken );
+        const { name, email, picture } = await googleVerify(googleToken);
 
         const usuarioDB = await Usuario.findOne({ email });
-        
+
         let usuario;
 
-        if( !usuarioDB ) { // Si no existe el usuario
+        if (!usuarioDB) { // Si no existe el usuario
             usuario = new Usuario({
-                nombre:name,
+                nombre: name,
                 email,
                 password: '@@@',
-                img:picture,
+                img: picture,
                 google: true
             })
         } else { //Existe usuario
@@ -85,34 +86,36 @@ const googleSignIn = async(req, res = response) => {
         await usuario.save();
 
         //Generar Json Web Token
-        const token = await generarJWT( usuario.id )
+        const token = await generarJWT(usuario.id)
 
         res.json({
-            ok:true,
-            token
+            ok: true,
+            token,
+            menu: getMenuFrontEnd(usuario.rol)
         });
-        
+
     } catch (error) {
         res.status(401).json({
-            ok:false,
+            ok: false,
             msg: 'Token no es correcto'
         });
     }
 }
 
-const renewToken = async( req, res = response)=> { //fn para renovar token
+const renewToken = async(req, res = response) => { //fn para renovar token
     const uid = req.uid;
-    
-    //generar JSON Web Token
-     const token = await generarJWT( uid )
 
-     //Obtener el usario por el uid
-     const usuario = await Usuario.findById( uid );
+    //generar JSON Web Token
+    const token = await generarJWT(uid)
+
+    //Obtener el usario por el uid
+    const usuario = await Usuario.findById(uid);
 
     res.json({
-        ok:true,
+        ok: true,
         token: token,
-        usuario
+        usuario,
+        menu: getMenuFrontEnd(usuario.rol)
     })
 }
 
